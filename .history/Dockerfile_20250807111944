@@ -1,0 +1,51 @@
+FROM python:3.11-slim
+
+# Install nsjail and system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    clang \
+    git \
+    pkg-config \
+    zlib1g-dev \
+    libcap-dev \
+    libseccomp-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    flex \
+    bison \
+    libnl-3-dev \
+    libnl-genl-3-dev \
+    libnl-route-3-dev \
+    ca-certificates \
+    curl \
+    unzip \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone and build nsjail from source
+RUN git clone https://github.com/google/nsjail.git /opt/nsjail && \
+    cd /opt/nsjail && \
+    make && \
+    cp nsjail /usr/local/bin/nsjail
+
+
+# Make nsjail globally accessible
+ENV PATH="/opt/nsjail:${PATH}"
+
+COPY nsjail/nsjail.cfg /app/nsjail.cfg
+
+WORKDIR /app
+
+COPY . .
+
+RUN [ ! -e /lib64 ] && ln -s /lib /lib64 || true
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Debug: Show numpy and pandas import locations
+RUN python -c "import numpy; print('numpy:', numpy.__file__); import pandas; print('pandas:', pandas.__file__)"
+
+EXPOSE 8080
+
+CMD ["python", "-u", "app/main.py"]
+

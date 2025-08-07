@@ -1,0 +1,35 @@
+FROM --platform=linux/amd64 python:3.11-slim
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    clang \
+    git \
+    libseccomp-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libnl-3-dev \
+    libnl-genl-3-dev \
+    libnl-route-3-dev \
+    pkg-config \
+    flex \
+    bison \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Use a stable commit known to work (not the kafel one)
+RUN git clone --recursive https://github.com/google/nsjail.git /opt/nsjail && \
+    cd /opt/nsjail && \
+    git checkout c60c1d7e31c7c6b39f5440adbf8d47487e524b6d && \
+    make && \
+    cp nsjail /usr/local/bin/nsjail
+
+WORKDIR /app
+
+COPY app/ /app
+COPY nsjail/nsjail.cfg /app/nsjail.cfg
+COPY scripts/ /scripts
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["python", "main.py"]

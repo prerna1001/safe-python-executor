@@ -1,0 +1,27 @@
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    clang \
+    git \
+    libseccomp-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    pkg-config \           # ✅ THIS is what was missing
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/google/nsjail.git /opt/nsjail && \
+    cd /opt/nsjail && \
+    git checkout 3.0 && \
+    make && \
+    cp nsjail /usr/local/bin/nsjail
+
+WORKDIR /app
+COPY app/ /app
+COPY nsjail/nsjail.cfg /app/nsjail.cfg
+COPY scripts/ /scripts
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["python", "main.py"]
