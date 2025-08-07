@@ -5,13 +5,13 @@ import textwrap
 
 def run_in_jail(script: str):
     # Ensure /scripts directory exists at runtime
-    os.makedirs("/scripts", exist_ok=True)
+    os.makedirs("scripts", exist_ok=True)
 
     # Dedent user script (remove any leading indentation)
     user_code = textwrap.dedent(script).strip()
 
     # Write a wrapped version of the user's script to /scripts/sandboxed.py
-    with open("/scripts/sandboxed.py", "w") as f:
+    with open("scripts/sandboxed.py", "w") as f:
         f.write(f"{user_code}\n\n")
         f.write(textwrap.dedent("""
         if __name__ == "__main__":
