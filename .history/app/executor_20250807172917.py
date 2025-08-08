@@ -11,8 +11,7 @@ def run_in_jail(script: str):
     user_code = textwrap.dedent(script).strip()
 
     # Write a wrapped version of the user's script to /scripts/sandboxed.py
-    print("DEBUG /scripts/sandboxed.py content:")
-    with open("/scripts/sandboxed.py", "w") as f:
+    with open("scripts/sandboxed.py", "w") as f:
         f.write(f"{user_code}\n\n")
         f.write(textwrap.dedent("""
         if __name__ == "__main__":

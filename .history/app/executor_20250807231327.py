@@ -42,11 +42,11 @@ def run_in_jail(script: str):
 
         stderr = result.stderr.decode()
         print("DEBUG STDOUT >>>")
-        print(stdout)
-        print("<<< END DEBUG STDOUT")
-        print("DEBUG STDERR >>>")
-        print(stderr)
-        print("<<< END DEBUG STDERR")
+print(stdout)
+print("<<< END DEBUG STDOUT")
+print("DEBUG STDERR >>>")
+print(stderr)
+print("<<< END DEBUG STDERR")
         return {
             "result": result_value,
             "stdout": stdout
