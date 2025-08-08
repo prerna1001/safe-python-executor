@@ -3,16 +3,15 @@ import os
 import json
 import textwrap
 
-
 def run_in_jail(script: str):
-    # Ensure /tmp directory exists at runtime
-    os.makedirs("/tmp", exist_ok=True)
+    # Ensure /scripts directory exists at runtime
+    os.makedirs("/scripts", exist_ok=True)
 
     # Dedent user script (remove any leading indentation)
     user_code = textwrap.dedent(script).strip()
 
-    # Write a wrapped version of the user's script to /tmp/sandboxed.py
-    with open("/tmp/sandboxed.py", "w") as f:
+    # Write a wrapped version of the user's script to /scripts/sandboxed.py
+    with open("/scripts/sandboxed.py", "w") as f:
         f.write(f"{user_code}\n\n")
         f.write(textwrap.dedent("""
         if __name__ == "__main__":
@@ -31,8 +30,6 @@ def run_in_jail(script: str):
         )
 
         stdout = result.stdout.decode()
-        stderr = result.stderr.decode()
-
         result_value = None
         for line in stdout.splitlines():
             if line.startswith("##RESULT##"):
@@ -40,6 +37,8 @@ def run_in_jail(script: str):
                     result_value = json.loads(line[len("##RESULT##"):])
                 except Exception:
                     result_value = line[len("##RESULT##"):]
+
+        stderr = result.stderr.decode()
         
         return {
             "result": result_value,

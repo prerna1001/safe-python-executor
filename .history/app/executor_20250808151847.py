@@ -47,6 +47,7 @@ def run_in_jail(script: str):
         }
 
     except subprocess.TimeoutExpired:
+        logger.error("Subprocess timed out")
         return {
             "result": None,
             "stdout": "",

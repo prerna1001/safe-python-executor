@@ -2,7 +2,10 @@ import subprocess
 import os
 import json
 import textwrap
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger()
 
 def run_in_jail(script: str):
     # Ensure /tmp directory exists at runtime
@@ -18,7 +21,7 @@ def run_in_jail(script: str):
         if __name__ == "__main__":
             import json
             result = main()
-            print("##RESULT##" + json.dumps(result))
+            print("##RESULT##" + json.dumps(result), flush=True)
         """))
 
     # Execute it inside nsjail
@@ -32,6 +35,9 @@ def run_in_jail(script: str):
 
         stdout = result.stdout.decode()
         stderr = result.stderr.decode()
+
+        logger.debug("Subprocess stdout:\n%s", stdout)
+        logger.debug("Subprocess stderr:\n%s", stderr)
 
         result_value = None
         for line in stdout.splitlines():
@@ -47,6 +53,7 @@ def run_in_jail(script: str):
         }
 
     except subprocess.TimeoutExpired:
+        logger.error("Subprocess timed out")
         return {
             "result": None,
             "stdout": "",

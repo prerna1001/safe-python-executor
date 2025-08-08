@@ -25,8 +25,11 @@ RUN apt-get update && apt-get install -y \
 # Clone and build nsjail from source
 RUN git clone https://github.com/google/nsjail.git /opt/nsjail && \
     cd /opt/nsjail && \
+    git checkout 90171fa06d3cb29e0122a37bb884fefabf2f82a && \  # Use a recent commit hash
     make && \
     cp nsjail /usr/local/bin/nsjail
+
+
 
 # Make nsjail globally accessible
 ENV PATH="/opt/nsjail:${PATH}"

@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
 from executor import run_in_jail
-
+import logging
+import os
 
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.DEBUG)
+app.logger.setLevel(logging.DEBUG)
 
 @app.route("/execute", methods=["POST"])
 def execute_script():
@@ -20,7 +23,14 @@ def execute_script():
     if result.get("result") is None:
         return jsonify({"error": "main() did not return a JSON-serializable object"}), 400
     return jsonify(result)
-
+v
+@app.route("/debug/tmp", methods=["GET"])
+def debug_tmp():
+    try:
+        files = os.listdir("/tmp")
+        return jsonify({"tmp_dir": files})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8080)

@@ -33,6 +33,9 @@ def run_in_jail(script: str):
         stdout = result.stdout.decode()
         stderr = result.stderr.decode()
 
+        logger.debug("Subprocess stdout:\n%s", stdout)
+        logger.debug("Subprocess stderr:\n%s", stderr)
+
         result_value = None
         for line in stdout.splitlines():
             if line.startswith("##RESULT##"):
@@ -47,6 +50,7 @@ def run_in_jail(script: str):
         }
 
     except subprocess.TimeoutExpired:
+        logger.error("Subprocess timed out")
         return {
             "result": None,
             "stdout": "",
